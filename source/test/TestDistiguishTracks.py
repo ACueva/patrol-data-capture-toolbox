@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #------------------------------------------------------------------------------
-# TestRemoveDuplicateData.py
+# TestDistiguishTracks.py
 # Description: Automatic Test of GP script/toolbox
 # Requirements: ArcGIS Desktop Standard
 # -----------------------------------------------------------------------------
@@ -26,29 +26,14 @@ import TestUtilities
 
 def RunTest():
     try:
-        arcpy.AddMessage("Starting Test: TestRemoveDuplicateData")
+        arcpy.AddMessage("Starting Test: TestDistiguishTracks")
                     
         # Prior to this, run TestTemplateConfig.py to verify the expected configuration exists
 
         inputTrackPointsFC = os.path.join(TestUtilities.inputGDB, "GPSData")
 
-        outputPointsFC =  os.path.join(TestUtilities.outputGDB, "GPSData_Duplicates")
-                
-        try :
-            # Delete Output if it exists   
-            desc = arcpy.Describe(outputPointsFC)
-            if desc != None :
-                print "Deleting: " + str(outputPointsFC)
-                arcpy.Delete_management(outputPointsFC)
-        except:    
-            print "Delete failed for: " + str(outputPointsFC)
-       
-        try :
-            # Copy Input (with Duplicates) to Output
-            print "Copying " + str(inputTrackPointsFC) + " --> " + str(outputPointsFC)
-            arcpy.Copy_management(inputTrackPointsFC, outputPointsFC)
-        except:    
-            print "Copy failed for: " + str(inputTrackPointsFC) + ":" + str(outputPointsFC)   
+        outputPointsFC =  os.path.join(TestUtilities.outputGDB, "SeparatedGPSData")
+        outputLinesFC =  os.path.join(TestUtilities.outputGDB, "TrackLines")        
                                         
         toolbox = TestUtilities.toolbox
                
@@ -59,29 +44,31 @@ def RunTest():
         arcpy.env.overwriteOutput = True
         arcpy.ImportToolbox(toolbox, "PDCAlias")
                
-        ########################################################3
+        dateTimeField = "Date_Time"
+        maximumTimeDelta = 100.0
+        
+        ########################################################
         # Execute the Model under test:   
-        arcpy.RemoveDuplicateGPSData_PDCAlias(outputPointsFC)
-        ########################################################3
+        # Format: DistinguishTracks_MyAlias(GPS_Data, DateTime_Field, Maximum_Time_Difference, SeparatedGPSData, TrackLines)
+        arcpy.DistinguishTracks_PDCAlias(inputTrackPointsFC, dateTimeField, maximumTimeDelta, outputPointsFC, outputLinesFC)
+        ########################################################
         
-        # Verify the results (Original Track Points)   
-        inputFeatureCount = int(arcpy.GetCount_management(inputTrackPointsFC).getOutput(0)) 
-        print "Input FeatureClass: " + str(inputTrackPointsFC)
-        print "Input Feature Count: " +  str(inputFeatureCount)
-                    
-        if (inputFeatureCount < 1) :
-            print "Invalid Output Feature Count: " +  str(inputFeatureCount)
-            raise Exception("Test Failed")       
-        
-        # There is only 1 duplicate record so new count will be inputFeatureCount - 1
-
-        # Verify the results (New Track Point)   
+        # Verify the results (Track Points)   
         outputFeatureCount = int(arcpy.GetCount_management(outputPointsFC).getOutput(0)) 
-        print "Output FeatureClass: " + str(outputPointsFC)
+        print "Output FeatureClass (Points): " + str(outputPointsFC)
         print "Output Feature Count: " +  str(outputFeatureCount)
                     
-        if (outputFeatureCount >= inputFeatureCount) :
-            print "Output Feature Count >= Input Feature Count: " + str(outputFeatureCount)
+        if (outputFeatureCount < 1) :
+            print "Invalid Output Feature Count: " +  str(outputFeatureCount)
+            raise Exception("Test Failed")       
+        
+        # Verify the results (Track Lines)       
+        outputFeatureCount = int(arcpy.GetCount_management(outputLinesFC).getOutput(0)) 
+        print "Output FeatureClass (Lines): " + str(outputLinesFC)
+        print "Output Feature Count: " +  str(outputFeatureCount)
+                    
+        if (outputFeatureCount < 1) :
+            print "Invalid Output Feature Count: " +  str(outputFeatureCount)
             raise Exception("Test Failed")                                              
         
         print "Test Successful"        

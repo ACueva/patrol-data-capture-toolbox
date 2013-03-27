@@ -26,9 +26,16 @@
       dest="${dir.datadir}/patrol_data_capture_data.zip" 
       verbose="true"
       usetimestamp="true"/>
+    <get src="http://www.arcgis.com/sharing/content/items/2f90466f6d6740e58aa4aea535e558b8/data"
+      dest="${dir.datadir}/patrol_data_capture_maps.zip" 
+      verbose="true"
+      usetimestamp="true"/>
 
-    <!-- Unzip Data Directory -->
+    <!-- Unzip Data Directories -->
     <unzip src="${dir.datadir}/patrol_data_capture_data.zip"
+         dest="${dir.datadir}">
+    </unzip>
+    <unzip src="${dir.datadir}/patrol_data_capture_maps.zip"
          dest="${dir.datadir}">
     </unzip>
   </target>
@@ -37,8 +44,10 @@
   <!-- Normally only for testing from a clean configuration -->
   <target name="clean">
     <delete dir="${dir.datadir}/data" />
+    <delete dir="${dir.datadir}/maps" />
     <echo message="Warning: deleting data dirs (only do this if you mean it)" />
     <echo message="Deleting path: ${dir.datadir}/data" />
+    <echo message="Deleting path: ${dir.datadir}/maps" />
   </target>
 
   <target name="test">

@@ -18,7 +18,7 @@
   <property name="pythonpath" value="${dir.arcpy}\DLLs;${dir.arcpy}\lib;${dir.arcpy}\lib\plat-win;${dir.arcpy}\lib\lib-tk;${dir.arcpy};${dir.arcpy}\lib\site-packages;${dir.arcgisdesktop}\bin;${dir.arcgisdesktop}\arcpy"/>
 
   <target name="run_all_tests" 
-    depends="get_data,test_config,test_gpx2layer,test_remove_duplicates">
+    depends="get_data,test_config,test_gpx2layer,test_remove_duplicates,test_distiguish_tracks,test_despike_gps">
     <echo message="All Tests Complete" />
   </target>
 
@@ -51,6 +51,22 @@
       <env key="PYTHONPATH" path="${pythonpath}"/>
       <arg line="-u"/>
       <arg line="${dir.src}/TestRemoveDuplicateData.py"/>
+    </exec>
+  </target>
+
+  <target name="test_distiguish_tracks">
+    <exec executable="${dir.arcpy}/python.exe" failonerror="true">
+      <env key="PYTHONPATH" path="${pythonpath}"/>
+      <arg line="-u"/>
+      <arg line="${dir.src}/TestDistiguishTracks.py"/>
+    </exec>
+  </target>
+
+  <target name="test_despike_gps">
+    <exec executable="${dir.arcpy}/python.exe" failonerror="true">
+      <env key="PYTHONPATH" path="${pythonpath}"/>
+      <arg line="-u"/>
+      <arg line="${dir.src}/TestDespikeGps.py"/>
     </exec>
   </target>
 

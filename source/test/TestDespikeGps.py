@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #------------------------------------------------------------------------------
-# TestRemoveDuplicateData.py
+# TestDespikeGps.py
 # Description: Automatic Test of GP script/toolbox
 # Requirements: ArcGIS Desktop Standard
 # -----------------------------------------------------------------------------
@@ -26,29 +26,13 @@ import TestUtilities
 
 def RunTest():
     try:
-        arcpy.AddMessage("Starting Test: TestRemoveDuplicateData")
+        arcpy.AddMessage("Starting Test: TestDespikeGps")
                     
         # Prior to this, run TestTemplateConfig.py to verify the expected configuration exists
 
-        inputTrackPointsFC = os.path.join(TestUtilities.inputGDB, "GPSData")
+        inputTrackPointsFC = os.path.join(TestUtilities.inputGDB, "SeparatedGPSData")
 
-        outputPointsFC =  os.path.join(TestUtilities.outputGDB, "GPSData_Duplicates")
-                
-        try :
-            # Delete Output if it exists   
-            desc = arcpy.Describe(outputPointsFC)
-            if desc != None :
-                print "Deleting: " + str(outputPointsFC)
-                arcpy.Delete_management(outputPointsFC)
-        except:    
-            print "Delete failed for: " + str(outputPointsFC)
-       
-        try :
-            # Copy Input (with Duplicates) to Output
-            print "Copying " + str(inputTrackPointsFC) + " --> " + str(outputPointsFC)
-            arcpy.Copy_management(inputTrackPointsFC, outputPointsFC)
-        except:    
-            print "Copy failed for: " + str(inputTrackPointsFC) + ":" + str(outputPointsFC)   
+        outputPointsFC =  os.path.join(TestUtilities.outputGDB, "DespikedGPSData")       
                                         
         toolbox = TestUtilities.toolbox
                
@@ -59,30 +43,39 @@ def RunTest():
         arcpy.env.overwriteOutput = True
         arcpy.ImportToolbox(toolbox, "PDCAlias")
                
-        ########################################################3
+        dateTimeField = "Date_Time"
+        trackIdField = "TrackGUID"
+        percent2Test = 0.5
+        maximumDeviation = 90.0
+        
+        ########################################################
         # Execute the Model under test:   
-        arcpy.RemoveDuplicateGPSData_PDCAlias(outputPointsFC)
-        ########################################################3
+        # Format: DespikeGPSLog_MyAlias(GPS_Data_with_Track_Identifiers, DateTime_Field, Track_ID_Field, Despiked_GPS_Log, Percent_to_test, Maximum_Deviation)
+        arcpy.DespikeGPSLog_PDCAlias(inputTrackPointsFC, dateTimeField, trackIdField, outputPointsFC, percent2Test, maximumDeviation)
+        ########################################################
         
-        # Verify the results (Original Track Points)   
-        inputFeatureCount = int(arcpy.GetCount_management(inputTrackPointsFC).getOutput(0)) 
-        print "Input FeatureClass: " + str(inputTrackPointsFC)
-        print "Input Feature Count: " +  str(inputFeatureCount)
-                    
-        if (inputFeatureCount < 1) :
-            print "Invalid Output Feature Count: " +  str(inputFeatureCount)
-            raise Exception("Test Failed")       
-        
-        # There is only 1 duplicate record so new count will be inputFeatureCount - 1
-
-        # Verify the results (New Track Point)   
+        # Verify the results (Spike Points)   
         outputFeatureCount = int(arcpy.GetCount_management(outputPointsFC).getOutput(0)) 
-        print "Output FeatureClass: " + str(outputPointsFC)
+        print "Output FeatureClass (Points): " + str(outputPointsFC)
         print "Output Feature Count: " +  str(outputFeatureCount)
                     
-        if (outputFeatureCount >= inputFeatureCount) :
-            print "Output Feature Count >= Input Feature Count: " + str(outputFeatureCount)
-            raise Exception("Test Failed")                                              
+        if (outputFeatureCount < 1) :
+            print "Invalid Output Feature Count: " +  str(outputFeatureCount)
+            raise Exception("Test Failed")  
+        
+        outputSpikePointsLayer = "DespikedGPSData_layer"             
+        
+        arcpy.MakeFeatureLayer_management(outputPointsFC, outputSpikePointsLayer)
+        query = "IsSpike = 'true'"
+        
+        arcpy.SelectLayerByAttribute_management(outputSpikePointsLayer, "NEW_SELECTION", query)
+        
+        spikedCount = arcpy.GetCount_management(outputSpikePointsLayer)
+        print "Number of Spiked Records is: " + str(spikedCount)
+        
+        if (spikedCount < 1) :
+            print "Invalid Spiked Feature Count: " +  str(spikedCount)
+            raise Exception("Test Failed") 
         
         print "Test Successful"        
                 

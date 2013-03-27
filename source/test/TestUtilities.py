@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #------------------------------------------------------------------------------
-# TemplateConfigTest.py
+# TestUtilities.py
 # Description: Common objects/methods used by test scripts
 # Requirements: ArcGIS Desktop Standard
 # -----------------------------------------------------------------------------
