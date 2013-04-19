@@ -10,8 +10,8 @@
 
   <!-- templatehome = defense-and-intel-analysis-toolbox -->
 
-  <property name="dir.arcpy" value="C:\Python27\ArcGIS10.1"/>
-  <property name="dir.arcgisdesktop" value="C:\Program Files (x86)\ArcGIS\Desktop10.1"/>
+  <property name="dir.arcpy" value="C:\Python27\ArcGIS10.2"/>
+  <property name="dir.arcgisdesktop" value="C:\Program Files (x86)\ArcGIS\Desktop10.2"/>
   <property name="dir.src" value="."/>
   <property name="dir.datafetchdir" value="../../"/>
 
