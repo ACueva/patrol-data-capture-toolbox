@@ -7,18 +7,17 @@
  -->
 
 <project name="DefenseAndIntelAnalysisToolboxTest" basedir="." default="run_all_tests">
-
+<import file="./versions.xml"/>
   <!-- templatehome = defense-and-intel-analysis-toolbox -->
 
-  <property name="dir.arcpy" value="C:\Python27\ArcGIS10.1"/>
-  <property name="dir.arcgisdesktop" value="C:\Program Files (x86)\ArcGIS\Desktop10.1"/>
+<!--   <property name="dir.arcpy" value="C:\Python27\ArcGIS10.1"/>
+  <property name="dir.arcgisdesktop" value="C:\Program Files (x86)\ArcGIS\Desktop10.1"/> -->
   <property name="dir.src" value="."/>
   <property name="dir.datafetchdir" value="../../"/>
-
   <property name="pythonpath" value="${dir.arcpy}\DLLs;${dir.arcpy}\lib;${dir.arcpy}\lib\plat-win;${dir.arcpy}\lib\lib-tk;${dir.arcpy};${dir.arcpy}\lib\site-packages;${dir.arcgisdesktop}\bin;${dir.arcgisdesktop}\arcpy"/>
 
   <target name="run_all_tests" 
-    depends="get_data,test_config,test_gpx2layer,test_remove_duplicates,test_distiguish_tracks,test_despike_gps">
+    depends="set_all_variables,get_data,test_config,test_gpx2layer,test_remove_duplicates,test_distiguish_tracks,test_despike_gps">
     <echo message="All Tests Complete" />
   </target>
 
@@ -30,7 +29,7 @@
     <echo message="INFO: Has Dependent Data task been run from: ${dir.datafetchdir}/build.xml" />
   </target>
 
-  <target name="test_config">
+  <target name="test_config" depends="set_all_variables">
     <exec executable="${dir.arcpy}/python.exe" failonerror="true">
       <env key="PYTHONPATH" path="${pythonpath}"/>
       <arg line="-u"/>
@@ -38,7 +37,7 @@
     </exec>
   </target>
 
-  <target name="test_gpx2layer">
+  <target name="test_gpx2layer" depends="set_all_variables">
     <exec executable="${dir.arcpy}/python.exe" failonerror="true">
       <env key="PYTHONPATH" path="${pythonpath}"/>
       <arg line="-u"/>
@@ -46,7 +45,7 @@
     </exec>
   </target>
 
-  <target name="test_remove_duplicates">
+  <target name="test_remove_duplicates" depends="set_all_variables">
     <exec executable="${dir.arcpy}/python.exe" failonerror="true">
       <env key="PYTHONPATH" path="${pythonpath}"/>
       <arg line="-u"/>
@@ -54,7 +53,7 @@
     </exec>
   </target>
 
-  <target name="test_distiguish_tracks">
+  <target name="test_distiguish_tracks" depends="set_all_variables">
     <exec executable="${dir.arcpy}/python.exe" failonerror="true">
       <env key="PYTHONPATH" path="${pythonpath}"/>
       <arg line="-u"/>
@@ -62,7 +61,7 @@
     </exec>
   </target>
 
-  <target name="test_despike_gps">
+  <target name="test_despike_gps" depends="set_all_variables">
     <exec executable="${dir.arcpy}/python.exe" failonerror="true">
       <env key="PYTHONPATH" path="${pythonpath}"/>
       <arg line="-u"/>
